@@ -16,11 +16,13 @@
 #include <pwd.h>
 #include <grp.h>
 #include <stdint.h>
+#include <libgen.h>
 
 #ifndef USE_FDS
 #define USE_FDS 15
 #endif
 
+int cont_list = 0;
 
 int a_lower_flag = 0;
 int a_upper_flag = 0;
@@ -177,36 +179,46 @@ int print_detailed_info(const struct stat *fileStat, const int typeflag, const c
 
 int configure_print(const struct stat *info, const int typeflag, const char *filepath)
 {
+    cont_list++;
 
+    if(cont_list>1){
 
-    if(a_upper_flag && filepath[0]!='.')
-    {
-
-
-        if(!l_lower_flag)
+        if(a_upper_flag)
         {
 
-            print_basic_info(info, typeflag, filepath);
-        }
-        else
-        {
-            print_detailed_info(info, typeflag, filepath);
-        }
-    }
-    else if(!a_upper_flag)
-    {
-        if((default_flag &&  filepath[0]!='.') || !default_flag){
-            if(!l_lower_flag)
-            {
+            if(strlen(filepath)>=2){
 
-                print_basic_info(info, typeflag, filepath);
+                if((filepath[0]=='.' && filepath[1]!='.') || filepath[0]!='.'){
+
+                    if(!l_lower_flag)
+                    {
+
+                        print_basic_info(info, typeflag, filepath);
+                    }
+                    else
+                    {
+                        print_detailed_info(info, typeflag, filepath);
+                    }
+                }
             }
-            else
-            {
-                print_detailed_info(info, typeflag, filepath);
+        }
+        else if(!a_upper_flag)
+        {
+            if((default_flag &&  filepath[0]!='.') || !default_flag){
+
+                if(!l_lower_flag)
+                {
+
+                    print_basic_info(info, typeflag, filepath);
+                }
+                else
+                {
+                    print_detailed_info(info, typeflag, filepath);
+                }
             }
         }
     }
+
     return 0;
 
 }
@@ -261,6 +273,8 @@ int print_directory_tree(const char *dirpath)
     flags |= FTW_ACTIONRETVAL;
     flags |= FTW_PHYS;
 
+
+
     if(d_lower_flag)
     {
         result = nftw(dirpath, print_only_directory_entry, USE_FDS, flags);
@@ -277,7 +291,27 @@ int print_directory_tree(const char *dirpath)
         result = nftw(dirpath, print_not_recursively_entry, USE_FDS, flags);
     }
 
+    struct stat file_info_um;
+    struct stat file_info_dois;
 
+    char *dummy  = strdup( dirpath );
+    char *dname = dirname( dummy );
+
+    if(a_lower_flag){
+        if(stat(dirpath, &file_info_um)!=0){
+           printf("Erro no stat!");
+           exit(-1);
+
+        }
+        if(stat(dname, &file_info_dois)!=0){
+           printf("Erro no stat!");
+           exit(-1);
+
+        }
+        configure_print(&file_info_um, FTW_D, ".");
+
+        configure_print(&file_info_dois, FTW_D, "..");
+    }
 
     if (result >= 0)
         errno = result;
