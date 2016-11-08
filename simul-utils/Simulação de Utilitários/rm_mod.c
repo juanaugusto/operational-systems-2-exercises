@@ -39,14 +39,15 @@
 
 int cont_list = 0;
 
+int f_lower_flag = 0;
 int i_lower_flag = 0;
 int r_upper_flag = 0;
-int s_lower_flag = 0;
-int u_lower_flag = 0;
-int v_lower_flag = 0;
+
 char *source;
 char *dest;
 
+char **strarray = NULL;
+int strcount;
 int cont = 0;
 
 #define BUFFERSIZE 1024
@@ -209,6 +210,11 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
 {
     cont_list++;
 
+    char line[1024];
+
+
+
+
 
     if(!(typeflag == FTW_D && cont_list==1))  //It is a directory
     {
@@ -227,8 +233,14 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
     {
 
         if(cont==2){
-            printf("ook");
-            rmdir(filepath);
+            //printf("ook %s\n", filepath);
+
+            strcpy(line, filepath);
+            strarray = (char **)realloc(strarray, (strcount + 1) * sizeof(char *));
+            strarray[strcount++] = strdup(line);
+
+
+            //rmdir(filepath);
         }
 
 
@@ -329,24 +341,18 @@ int main(int argc, char **argv)
     int index;
     int c;
 
-    while ((c = getopt (argc, argv, "iRsuv")) != -1)
+    while ((c = getopt (argc, argv, "fiR")) != -1)
     {
         switch (c)
         {
+        case 'f':
+            f_lower_flag = 1;
+            break;
         case 'i':
             i_lower_flag = 1;
             break;
         case 'R':
             r_upper_flag = 1;
-            break;
-        case 's':
-            s_lower_flag = 1;
-            break;
-        case 'u':
-            u_lower_flag = 1;
-            break;
-        case 'v':
-            v_lower_flag = 1;
             break;
         case '?':
             exit(-1);
@@ -369,6 +375,17 @@ int main(int argc, char **argv)
     source = argv[optind];
 
     percurr_directory_tree();
+
+    int i;
+    if(strcount>0){
+
+        for(i = strcount -1; i > -1; i--){
+            rmdir(strarray[i]);
+            printf("strarray[%d] == %s\n", i, strarray[i]);
+        }
+
+    }
+
 
     printf("cont %d\n",cont_list);
 
