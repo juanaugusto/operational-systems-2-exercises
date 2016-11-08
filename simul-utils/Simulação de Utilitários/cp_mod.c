@@ -5,6 +5,7 @@
 
 
 #include <stdio.h>
+#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
@@ -13,18 +14,13 @@
 #include <time.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/time.h>
 #include <pwd.h>
 #include <grp.h>
 #include <stdint.h>
 #include <libgen.h>
 
 #include <fcntl.h>
-#if defined(__APPLE__) || defined(__FreeBSD__)
-#include <copyfile.h>
-#else
-#include <sys/sendfile.h>
-#endif
-
 
 #include <stddef.h>
 
@@ -52,6 +48,20 @@ char *dest;
 Nomes: Jéssica Genta dos Santos - DRE: 111031073
        Juan Augusto Santos de Paula - DRE: 111222844
 */
+
+void timespec_diff(struct timespec *start, struct timespec *stop,
+                   struct timespec *result)
+{
+    if ((stop->tv_nsec - start->tv_nsec) < 0) {
+        result->tv_sec = stop->tv_sec - start->tv_sec - 1;
+        result->tv_nsec = stop->tv_nsec - start->tv_nsec + 1000000000;
+    } else {
+        result->tv_sec = stop->tv_sec - start->tv_sec;
+        result->tv_nsec = stop->tv_nsec - start->tv_nsec;
+    }
+
+    return;
+}
 
 void oops(const char *s1, const char *s2)
 {
@@ -235,22 +245,152 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
 
 
     struct stat st;
+    struct stat st2;
 
     if(typeflag==FTW_D && r_upper_flag)
     {
         if (stat(aux, &st) == -1)
         {
-            printf("ok1\n");
             mkdir(aux, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-            printf("ok2\n");
         }
 
     }
 
 
+
+    char overwrite;
     if(!(typeflag == FTW_D))
     {
-        make_copy(filepath, aux);
+        if(v_lower_flag)
+        {
+            printf("\"%s\" -> \"%s\" \n",filepath, aux);
+        }
+
+        int compare = 0; //If not u flag, compare equals to zero
+
+
+        if (stat(aux, &st) == 0)
+        {
+            if(u_lower_flag)
+            {
+                struct timeval seconds_since_1970;
+                TIMESPEC_TO_TIMEVAL(&seconds_since_1970, &st.st_mtim);
+                if(stat(filepath, &st2) == 0)
+                {
+                    struct timeval seconds_since_1970_2;
+                    TIMESPEC_TO_TIMEVAL(&seconds_since_1970_2, &st2.st_mtim);
+
+                    //double xx  = timespec_diff(seconds_since_1970_2, seconds_since_1970);
+                    if(timercmp(&seconds_since_1970_2, &seconds_since_1970, >))
+                    {
+                        compare = 1;
+                    }
+                }
+
+                if(compare)
+                {
+                    if(i_lower_flag)
+                    {
+                        if(tolower(overwrite)=='s' || tolower(overwrite)=='y')
+                        {
+                            printf("Deseja sobrescrever %s?\n", filepath);
+                            scanf("%c",&overwrite);
+                            if(s_lower_flag)
+                            {
+                                unlink(aux);
+                                symlink(filepath, aux);
+
+                            }
+                            else
+                            {
+                                make_copy(filepath, aux);
+
+                            }
+
+                        }
+                    }
+                    else
+                    {
+
+                        if(s_lower_flag)
+                        {
+                            unlink(aux);
+                            symlink(filepath, aux);
+
+                        }
+                        else
+                        {
+                            make_copy(filepath, aux);
+
+                        }
+
+                    }
+
+                }
+
+            }
+            else
+            {
+                if(i_lower_flag)
+                {
+                    if(tolower(overwrite)=='s' || tolower(overwrite)=='y')
+                    {
+                        printf("Deseja sobrescrever %s?\n", filepath);
+                        scanf("%c",&overwrite);
+                        if(s_lower_flag)
+                        {
+                            unlink(aux);
+                            symlink(filepath, aux);
+
+                        }
+                        else
+                        {
+                            make_copy(filepath, aux);
+
+                        }
+
+                    }
+                }
+                else
+                {
+
+                    if(s_lower_flag)
+                    {
+                        unlink(aux);
+                        symlink(filepath, aux);
+
+                    }
+                    else
+                    {
+                        make_copy(filepath, aux);
+
+                    }
+
+                }
+
+
+            }
+
+
+
+
+
+
+        }
+        else
+        {
+            if(s_lower_flag)
+            {
+                symlink(filepath, aux);
+
+            }
+            else
+            {
+                make_copy(filepath, aux);
+
+            }
+
+        }
     }
 
 
