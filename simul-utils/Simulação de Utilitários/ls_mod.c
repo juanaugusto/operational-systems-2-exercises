@@ -228,9 +228,6 @@ int print_not_recursively_entry(const char *filepath, const struct stat *info,
                                 const int typeflag, struct FTW *pathinfo)
 {
 
-    //const char *fi = filepath + pathinfo->base;
-    //printf("dddd %s \n",filepath);
-
     configure_print(info, typeflag, filepath + pathinfo->base);
 
 
