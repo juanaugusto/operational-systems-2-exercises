@@ -17,6 +17,7 @@
 #include <grp.h>
 #include <stdint.h>
 #include <libgen.h>
+#include <getopt.h>
 
 #ifndef USE_FDS
 #define USE_FDS 15
@@ -31,6 +32,7 @@ int d_lower_flag = 0;
 int r_upper_flag = 0;
 int i_lower_flag = 0;
 int l_lower_flag = 0;
+
 int default_flag = 0;
 
 /*
@@ -47,8 +49,10 @@ int print_inode(unsigned long ino)
     return 0;
 }
 
-int print_parent_folder(int typeflag){
-    if(r_upper_flag && FTW_D==typeflag){
+int print_parent_folder(int typeflag)
+{
+    if(r_upper_flag && FTW_D==typeflag)
+    {
         printf("\n");
     }
     return 0;
@@ -114,6 +118,12 @@ int print_detailed_info(const struct stat *fileStat, const int typeflag, const c
 
     pwd = getpwuid(fileStat->st_uid);
     printf(" %s ", pwd->pw_name);
+
+    if(author_flag){
+        pwd = getpwuid(fileStat->st_uid);
+        printf(" %s ", pwd->pw_name);
+    }
+
 
     printf(" %lu ",fileStat->st_size);
 
@@ -181,14 +191,17 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
 {
     cont_list++;
 
-    if(cont_list>1){
+    if(cont_list>1)
+    {
 
         if(a_upper_flag)
         {
 
-            if(strlen(filepath)>=2){
+            if(strlen(filepath)>=2)
+            {
 
-                if((filepath[0]=='.' && filepath[1]!='.') || filepath[0]!='.'){
+                if((filepath[0]=='.' && filepath[1]!='.') || filepath[0]!='.')
+                {
 
                     if(!l_lower_flag)
                     {
@@ -204,7 +217,8 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
         }
         else if(!a_upper_flag)
         {
-            if((default_flag &&  filepath[0]!='.') || !default_flag){
+            if((default_flag &&  filepath[0]!='.') || !default_flag)
+            {
 
                 if(!l_lower_flag)
                 {
@@ -294,15 +308,18 @@ int print_directory_tree(const char *dirpath)
     char *dummy  = strdup( dirpath );
     char *dname = dirname( dummy );
 
-    if(a_lower_flag){
-        if(stat(dirpath, &file_info_um)!=0){
-           printf("Erro no stat!");
-           exit(-1);
+    if(a_lower_flag)
+    {
+        if(stat(dirpath, &file_info_um)!=0)
+        {
+            printf("Erro no stat!");
+            exit(-1);
 
         }
-        if(stat(dname, &file_info_dois)!=0){
-           printf("Erro no stat!");
-           exit(-1);
+        if(stat(dname, &file_info_dois)!=0)
+        {
+            printf("Erro no stat!");
+            exit(-1);
 
         }
         configure_print(&file_info_um, FTW_D, ".");
@@ -327,20 +344,29 @@ int main(int argc, char **argv)
     int index;
     int c;
 
-    while ((c = getopt (argc, argv, "aARidl")) != -1)
+    static struct option long_options[] =
     {
+        {"all",           no_argument, 0, 'a'},
+        {"almost-all",     no_argument, 0, 'A'},
+        {"author",       no_argument, &author_flag, 1},
+        {"directory",   no_argument, 0, 'd'},
+        {"recursive",no_argument, 0, 'r'},
+        {"inode",            no_argument, 0, 'i'},
+        { NULL,            no_argument,        NULL,    0 }
+    };
+
+    int option_index = 0;
+    while ((c = getopt_long(argc, argv, "aARidl", long_options, &index)) != -1)
+    {
+
+
         switch (c)
         {
         case 'a':
             a_lower_flag = 1;
-            a_upper_flag = 0;
             break;
         case 'A':
             a_upper_flag = 1;
-            if(a_lower_flag)
-            {
-                a_upper_flag = 0;
-            }
             break;
         case 'R':
             r_upper_flag = 1;
@@ -361,20 +387,40 @@ int main(int argc, char **argv)
         }
     }
 
+    //-a pass over -A
+    if(a_lower_flag)
+    {
+        a_upper_flag = 0;
+    }
+
     //Setting default
     if(!a_lower_flag && !a_upper_flag)
     {
         default_flag = 1;
     }
 
+    struct stat st;
 
     for (index = optind; index < argc; index++)
     {
-        printf ("Listing contents of directory %s\n", argv[index]);
-        print_directory_tree(argv[index]);
-        printf("\n\n");
+        if(lstat(argv[index], &st) == 0)
+        {
+            cont_list = 0;
+            if(!S_ISDIR(st.st_mode)){
+                cont_list = 2;
+                configure_print(&st, FTW_F, argv[index]);
+                printf("\n\n");
+            }else{
+                printf ("Listing contents of directory %s:\n", argv[index]);
+                print_directory_tree(argv[index]);
+                printf("\n\n");
+
+            }
+
+        }
 
     }
+
 
     if(optind==argc)
     {
@@ -386,3 +432,4 @@ int main(int argc, char **argv)
 
     return 0;
 }
+

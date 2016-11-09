@@ -49,19 +49,6 @@ Nomes: Jéssica Genta dos Santos - DRE: 111031073
        Juan Augusto Santos de Paula - DRE: 111222844
 */
 
-void timespec_diff(struct timespec *start, struct timespec *stop,
-                   struct timespec *result)
-{
-    if ((stop->tv_nsec - start->tv_nsec) < 0) {
-        result->tv_sec = stop->tv_sec - start->tv_sec - 1;
-        result->tv_nsec = stop->tv_nsec - start->tv_nsec + 1000000000;
-    } else {
-        result->tv_sec = stop->tv_sec - start->tv_sec;
-        result->tv_nsec = stop->tv_nsec - start->tv_nsec;
-    }
-
-    return;
-}
 
 void oops(const char *s1, const char *s2)
 {
@@ -236,13 +223,10 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
 
     strcat(aux, part);
 
-    printf("filepath %s \n", filepath);
+    /*printf("filepath %s \n", filepath);
     printf("string source to find %s\n", source);
     printf("part %s \n", part);
-    printf("aux %s \n", aux);
-
-
-
+    printf("aux %s \n", aux);*/
 
     struct stat st;
     struct stat st2;
@@ -280,7 +264,6 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
                     struct timeval seconds_since_1970_2;
                     TIMESPEC_TO_TIMEVAL(&seconds_since_1970_2, &st2.st_mtim);
 
-                    //double xx  = timespec_diff(seconds_since_1970_2, seconds_since_1970);
                     if(timercmp(&seconds_since_1970_2, &seconds_since_1970, >))
                     {
                         compare = 1;

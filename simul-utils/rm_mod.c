@@ -20,13 +20,6 @@
 #include <libgen.h>
 
 #include <fcntl.h>
-#if defined(__APPLE__) || defined(__FreeBSD__)
-#include <copyfile.h>
-#else
-#include <sys/sendfile.h>
-#endif
-
-
 #include <stddef.h>
 
 #if (__STDC_VERSION__ >= 199901L)
@@ -340,6 +333,19 @@ int main(int argc, char **argv)
 
     int index;
     int c;
+
+    // TODO Colocar as opções certas
+
+    /*static struct option long_options[] =
+    {
+        {"all",           no_argument, 0, 'a'},
+        {"almost-all",     no_argument, 0, 'A'},
+        {"author",       no_argument, &author_flag, 1},
+        {"directory",   no_argument, 0, 'd'},
+        {"recursive",no_argument, 0, 'r'},
+        {"inode",            no_argument, 0, 'i'},
+        { NULL,            no_argument,        NULL,    0 }
+    };*/
 
     while ((c = getopt (argc, argv, "fiR")) != -1)
     {
