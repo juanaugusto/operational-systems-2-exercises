@@ -1,8 +1,12 @@
+/*
+Nomes: Jéssica Genta dos Santos - DRE: 111031073
+       Juan Augusto Santos de Paula - DRE: 111222844
+*/
+
 #define _GNU_SOURCE
 
 #define _XOPEN_SOURCE 700
 #include <ftw.h>
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,7 +19,6 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <grp.h>
-#include <stdint.h>
 #include <libgen.h>
 #include <getopt.h>
 
@@ -35,10 +38,7 @@ int l_lower_flag = 0;
 
 int default_flag = 0;
 
-/*
-Nomes: Jéssica Genta dos Santos - DRE: 111031073
-       Juan Augusto Santos de Paula - DRE: 111222844
-*/
+
 
 int print_inode(unsigned long ino)
 {
@@ -350,12 +350,11 @@ int main(int argc, char **argv)
         {"almost-all",     no_argument, 0, 'A'},
         {"author",       no_argument, &author_flag, 1},
         {"directory",   no_argument, 0, 'd'},
-        {"recursive",no_argument, 0, 'r'},
+        {"recursive",no_argument, 0, 'R'},
         {"inode",            no_argument, 0, 'i'},
         { NULL,            no_argument,        NULL,    0 }
     };
 
-    int option_index = 0;
     while ((c = getopt_long(argc, argv, "aARidl", long_options, &index)) != -1)
     {
 

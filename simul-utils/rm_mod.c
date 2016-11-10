@@ -1,9 +1,12 @@
+/*
+Nomes: Jéssica Genta dos Santos - DRE: 111031073
+       Juan Augusto Santos de Paula - DRE: 111222844
+*/
 
 #define _GNU_SOURCE
 
 #define _XOPEN_SOURCE 700
 #include <ftw.h>
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,14 +20,8 @@
 #include <pwd.h>
 #include <grp.h>
 #include <stdint.h>
-#include <libgen.h>
-
 #include <fcntl.h>
-#include <stddef.h>
-
-#if (__STDC_VERSION__ >= 199901L)
-#include <stdint.h>
-#endif
+#include <getopt.h>
 
 #ifndef USE_FDS
 #define USE_FDS 15
@@ -35,6 +32,8 @@ int cont_list = 0;
 int f_lower_flag = 0;
 int i_lower_flag = 0;
 int r_upper_flag = 0;
+int preserve_root_flag = 0;
+int no_preserve_root_flag = 0;
 
 char *source;
 char *dest;
@@ -45,10 +44,7 @@ int cont = 0;
 
 #define BUFFERSIZE 1024
 #define COPYMORE 0644
-/*
-Nomes: Jéssica Genta dos Santos - DRE: 111031073
-       Juan Augusto Santos de Paula - DRE: 111222844
-*/
+
 
 void oops(const char *s1, const char *s2)
 {
@@ -220,20 +216,14 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
 
     }
 
-    struct stat st;
-
     if(typeflag==FTW_D && r_upper_flag)
     {
 
         if(cont==2){
-            //printf("ook %s\n", filepath);
-
             strcpy(line, filepath);
             strarray = (char **)realloc(strarray, (strcount + 1) * sizeof(char *));
             strarray[strcount++] = strdup(line);
 
-
-            //rmdir(filepath);
         }
 
 
@@ -331,23 +321,20 @@ int main(int argc, char **argv)
     extern char *optarg;
     extern int optind,optopt;
 
-    int index;
     int c;
-
+    int index;
     // TODO Colocar as opções certas
 
-    /*static struct option long_options[] =
+    static struct option long_options[] =
     {
-        {"all",           no_argument, 0, 'a'},
-        {"almost-all",     no_argument, 0, 'A'},
-        {"author",       no_argument, &author_flag, 1},
-        {"directory",   no_argument, 0, 'd'},
-        {"recursive",no_argument, 0, 'r'},
-        {"inode",            no_argument, 0, 'i'},
+        {"force",           no_argument, 0, 'f'},
+        {"recursive",     no_argument, 0, 'R'},
+        {"preserve-root",       no_argument, &preserve_root_flag, 1},
+        {"no-preserve-root",   no_argument, &no_preserve_root_flag, 1},
         { NULL,            no_argument,        NULL,    0 }
-    };*/
+    };
 
-    while ((c = getopt (argc, argv, "fiR")) != -1)
+    while ((c = getopt_long(argc, argv, "fiR", long_options, &index)) != -1)
     {
         switch (c)
         {

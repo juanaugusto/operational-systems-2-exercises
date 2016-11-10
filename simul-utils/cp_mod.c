@@ -3,7 +3,6 @@
 #define _XOPEN_SOURCE 700
 #include <ftw.h>
 
-
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -19,14 +18,7 @@
 #include <grp.h>
 #include <stdint.h>
 #include <libgen.h>
-
 #include <fcntl.h>
-
-#include <stddef.h>
-
-#if (__STDC_VERSION__ >= 199901L)
-#include <stdint.h>
-#endif
 
 #ifndef USE_FDS
 #define USE_FDS 15
@@ -454,7 +446,6 @@ int main(int argc, char **argv)
     extern char *optarg;
     extern int optind,optopt;
 
-    int index;
     int c;
 
     while ((c = getopt (argc, argv, "iRsuv")) != -1)
