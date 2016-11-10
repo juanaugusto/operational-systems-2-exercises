@@ -21,6 +21,8 @@ Nomes: Jéssica Genta dos Santos - DRE: 111031073
 #include <grp.h>
 #include <libgen.h>
 #include <getopt.h>
+#include "simul_utils.h"
+
 
 #ifndef USE_FDS
 #define USE_FDS 15
