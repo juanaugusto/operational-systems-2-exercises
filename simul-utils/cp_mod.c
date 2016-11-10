@@ -491,8 +491,6 @@ int main(int argc, char **argv)
 
     percurr_directory_tree();
 
-    printf("cont %d\n",cont_list);
-
     return 0;
 }
 
