@@ -46,7 +46,7 @@ int cont = 0;
 #define COPYMORE 0644
 
 
-void oops(const char *s1, const char *s2)
+void erro(const char *s1, const char *s2)
 {
     fprintf(stderr, "Error: %s ", s1);
     perror(s2);
@@ -62,13 +62,13 @@ int make_copy(const char *source_f, const char *destination_f)
     /* open files */
     if( (in_fd=open(source_f, O_RDONLY)) == -1 )
     {
-        oops("Cannot open ", source_f);
+        erro("Cannot open ", source_f);
     }
 
 
     if( (out_fd=creat(destination_f, COPYMORE)) == -1 )
     {
-        oops("Cannot creat ", destination_f);
+        erro("Cannot creat ", destination_f);
     }
 
 
@@ -77,13 +77,13 @@ int make_copy(const char *source_f, const char *destination_f)
     {
         if( write(out_fd, buf, n_chars) != n_chars )
         {
-            oops("Write error to ", destination_f);
+            erro("Write error to ", destination_f);
         }
 
 
         if( n_chars == -1 )
         {
-            oops("Read error from ", source_f);
+            erro("Read error from ", source_f);
         }
     }
 
@@ -91,7 +91,7 @@ int make_copy(const char *source_f, const char *destination_f)
     /* close files */
     if( close(in_fd) == -1 || close(out_fd) == -1 )
     {
-        oops("Error closing files", "");
+        erro("Error closing files", "");
 
     }
 
@@ -201,21 +201,6 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
 
     char line[1024];
 
-
-
-
-
-    if(!(typeflag == FTW_D && cont_list==1))  //It is a directory
-    {
-
-
-    }
-    else if(!(typeflag == FTW_F && cont_list==1))  //It is a file
-    {
-
-
-    }
-
     if(typeflag==FTW_D && r_upper_flag)
     {
 
@@ -229,12 +214,10 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
 
     }
 
-
     if(!(typeflag == FTW_D))
     {
         unlink(filepath);
     }
-
 
     return 0;
 
@@ -245,17 +228,13 @@ int show_not_recursively_entry(const char *filepath, const struct stat *info,
                                const int typeflag, struct FTW *pathinfo)
 {
 
-
     configure_print(info, typeflag, filepath );
-
 
     if(pathinfo->level!=1)
     {
         return FTW_CONTINUE;
     }
-
     return FTW_SKIP_SUBTREE;
-
 }
 
 
@@ -264,7 +243,6 @@ int show_recursively_entry(const char *filepath, const struct stat *info,
 {
     configure_print(info, typeflag, filepath );
     return FTW_CONTINUE;
-
 }
 
 int print_only_directory_entry(const char *filepath, const struct stat *info,
@@ -354,6 +332,8 @@ int main(int argc, char **argv)
         }
     }
 
+
+
     if(argc-optind<1)
     {
         printf("Less arguments were passed\n");
@@ -367,20 +347,21 @@ int main(int argc, char **argv)
 
     source = argv[optind];
 
+    if(strcmp(source,"/")==0 && no_preserve_root_flag==0){
+        printf("It's dangerous to remove root folder!\n");
+        exit(1);
+    }
+
+
     percurr_directory_tree();
 
     int i;
     if(strcount>0){
-
         for(i = strcount -1; i > -1; i--){
             rmdir(strarray[i]);
-            printf("strarray[%d] == %s\n", i, strarray[i]);
         }
 
     }
-
-
-    printf("cont %d\n",cont_list);
 
     return 0;
 }
