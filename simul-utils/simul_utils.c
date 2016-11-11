@@ -2,8 +2,18 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <unistd.h>
+
+
+#include <fcntl.h>
+
+
 
 #include "simul_utils.h"
+
+#define BUFFERSIZE 1024
+#define COPYMORE 0644
 
 char *repl_str(const char *str, const char *from, const char *to)
 {
@@ -21,11 +31,11 @@ char *repl_str(const char *str, const char *from, const char *to)
     char *pret, *ret = NULL;
     const char *pstr2, *pstr = str;
     size_t i, count = 0;
-#if (__STDC_VERSION__ >= 199901L)
-    uintptr_t *pos_cache_tmp, *pos_cache = NULL;
-#else
-    ptrdiff_t *pos_cache_tmp, *pos_cache = NULL;
-#endif
+    #if (__STDC_VERSION__ >= 199901L)
+        uintptr_t *pos_cache_tmp, *pos_cache = NULL;
+    #else
+        ptrdiff_t *pos_cache_tmp, *pos_cache = NULL;
+    #endif
     size_t cache_sz = 0;
     size_t cpylen, orglen, retlen, tolen, fromlen = strlen(from);
 
@@ -94,9 +104,56 @@ char *repl_str(const char *str, const char *from, const char *to)
         ret[retlen] = '\0';
     }
 
-end_repl_str:
-    /* Free the cache and return the post-replacement string,
-     * which will be NULL in the event of an error. */
-    free(pos_cache);
-    return ret;
+    end_repl_str:
+        /* Free the cache and return the post-replacement string,
+         * which will be NULL in the event of an error. */
+        free(pos_cache);
+        return ret;
+}
+
+void print_error_copy(const char *s1, const char *s2)
+{
+    fprintf(stderr, "Error: %s ", s1);
+    perror(s2);
+    exit(1);
+}
+
+int make_copy(const char *source_f, const char *destination_f)
+{
+    int in_fd, out_fd, n_chars;
+    char buf[BUFFERSIZE];
+
+    if( (in_fd=open(source_f, O_RDONLY)) == -1 )
+    {
+        print_error_copy("Cannot open ", source_f);
+    }
+
+
+    if( (out_fd=creat(destination_f, COPYMORE)) == -1 )
+    {
+        print_error_copy("Cannot creat ", destination_f);
+    }
+
+    while( (n_chars = read(in_fd, buf, BUFFERSIZE)) > 0 )
+    {
+        if( write(out_fd, buf, n_chars) != n_chars )
+        {
+            print_error_copy("Write error to ", destination_f);
+        }
+
+
+        if( n_chars == -1 )
+        {
+            print_error_copy("Read error from ", source_f);
+        }
+    }
+
+    if( close(in_fd) == -1 || close(out_fd) == -1 )
+    {
+        print_error_copy("Error closing files", "");
+
+    }
+
+
+    return 1;
 }

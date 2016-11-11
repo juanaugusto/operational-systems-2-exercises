@@ -252,7 +252,7 @@ int main(int argc, char **argv)
 
 
     int i;
-    char overwrite;
+    char remove_ask;
     if(strfiles_count>0)
     {
         for(i = strfiles_count -1; i > -1; i--)
@@ -261,10 +261,10 @@ int main(int argc, char **argv)
             {
                 printf("Do you want to remove file %s?\n", strfiles[i]);
                 fgets(buffer_read, sizeof buffer_read, stdin);
-                sscanf(buffer_read, "%c", &overwrite);
+                sscanf(buffer_read, "%c", &remove_ask);
 
 
-                if(tolower(overwrite)=='s' || tolower(overwrite)=='y')
+                if(tolower(remove_ask)=='s' || tolower(remove_ask)=='y')
                 {
                     print_remove_message(strfiles[i],0,0);
                     unlink(strfiles[i]);

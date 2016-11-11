@@ -36,65 +36,20 @@ int v_lower_flag = 0;
 char *source;
 char *dest;
 
-#define BUFFERSIZE 1024
-#define COPYMORE 0644
+char buffer_read[1000];
+
 /*
 Nomes: Jéssica Genta dos Santos - DRE: 111031073
        Juan Augusto Santos de Paula - DRE: 111222844
 */
 
-
-void oops(const char *s1, const char *s2)
-{
-    fprintf(stderr, "Error: %s ", s1);
-    perror(s2);
-    exit(1);
-}
-
-int make_copy(const char *source_f, const char *destination_f)
-{
-    int in_fd, out_fd, n_chars;
-    char buf[BUFFERSIZE];
-
-
-    /* open files */
-    if( (in_fd=open(source_f, O_RDONLY)) == -1 )
+int print_copied_file(const char* filepath, const char* aux){
+    if(v_lower_flag)
     {
-        oops("Cannot open ", source_f);
+        printf("\"%s\" -> \"%s\" \n",filepath, aux);
     }
 
-
-    if( (out_fd=creat(destination_f, COPYMORE)) == -1 )
-    {
-        oops("Cannot creat ", destination_f);
-    }
-
-
-    /* copy files */
-    while( (n_chars = read(in_fd, buf, BUFFERSIZE)) > 0 )
-    {
-        if( write(out_fd, buf, n_chars) != n_chars )
-        {
-            oops("Write error to ", destination_f);
-        }
-
-
-        if( n_chars == -1 )
-        {
-            oops("Read error from ", source_f);
-        }
-    }
-
-
-    /* close files */
-    if( close(in_fd) == -1 || close(out_fd) == -1 )
-    {
-        oops("Error closing files", "");
-
-    }
-
-
-    return 1;
+    return 0;
 }
 
 
@@ -109,23 +64,7 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
 
     part = repl_str(filepath, source, "" );
 
-    if(!(typeflag == FTW_D && cont_list==1))  //It is a directory
-    {
-
-
-    }
-    else if(!(typeflag == FTW_F && cont_list==1))  //It is a file
-    {
-
-
-    }
-
     strcat(aux, part);
-
-    /*printf("filepath %s \n", filepath);
-    printf("string source to find %s\n", source);
-    printf("part %s \n", part);
-    printf("aux %s \n", aux);*/
 
     struct stat st;
     struct stat st2;
@@ -144,10 +83,7 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
     char overwrite;
     if(!(typeflag == FTW_D))
     {
-        if(v_lower_flag)
-        {
-            printf("\"%s\" -> \"%s\" \n",filepath, aux);
-        }
+
 
         int compare = 0; //If not u flag, compare equals to zero
 
@@ -173,10 +109,13 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
                 {
                     if(i_lower_flag)
                     {
+                        printf("Do you want to overwrite %s?\n", aux);
+                        fgets(buffer_read, sizeof buffer_read, stdin);
+                        sscanf(buffer_read, "%c", &overwrite);
+
                         if(tolower(overwrite)=='s' || tolower(overwrite)=='y')
                         {
-                            printf("Deseja sobrescrever %s?\n", filepath);
-                            scanf("%c",&overwrite);
+
                             if(s_lower_flag)
                             {
                                 unlink(aux);
@@ -188,6 +127,7 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
                                 make_copy(filepath, aux);
 
                             }
+                            print_copied_file(filepath, aux);
 
                         }
                     }
@@ -205,6 +145,7 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
                             make_copy(filepath, aux);
 
                         }
+                        print_copied_file(filepath, aux);
 
                     }
 
@@ -215,10 +156,13 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
             {
                 if(i_lower_flag)
                 {
+                    printf("Do you want to overwrite %s?\n", aux);
+                    fgets(buffer_read, sizeof buffer_read, stdin);
+                    sscanf(buffer_read, "%c", &overwrite);
+
                     if(tolower(overwrite)=='s' || tolower(overwrite)=='y')
                     {
-                        printf("Deseja sobrescrever %s?\n", filepath);
-                        scanf("%c",&overwrite);
+
                         if(s_lower_flag)
                         {
                             unlink(aux);
@@ -230,6 +174,9 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
                             make_copy(filepath, aux);
 
                         }
+
+                        print_copied_file(filepath, aux);
+
 
                     }
                 }
@@ -248,15 +195,12 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
 
                     }
 
+                    print_copied_file(filepath, aux);
+
                 }
 
 
             }
-
-
-
-
-
 
         }
         else
@@ -271,6 +215,8 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
                 make_copy(filepath, aux);
 
             }
+
+            print_copied_file(filepath, aux);
 
         }
     }
@@ -307,13 +253,6 @@ int show_recursively_entry(const char *filepath, const struct stat *info,
 
 }
 
-int print_only_directory_entry(const char *filepath, const struct stat *info,
-                               const int typeflag, struct FTW *pathinfo)
-{
-    configure_print(info, typeflag, filepath + pathinfo->base);
-    return FTW_STOP;
-
-}
 
 
 int percurr_directory_tree()
@@ -328,14 +267,8 @@ int percurr_directory_tree()
     flags |= FTW_ACTIONRETVAL;
     flags |= FTW_PHYS;
 
-    if(r_upper_flag)
-    {
-        result = nftw(source, show_recursively_entry, USE_FDS, flags);
-    }
-    else
-    {
-        result = nftw(source, show_not_recursively_entry, USE_FDS, flags);
-    }
+    result = nftw(source, show_recursively_entry, USE_FDS, flags);
+
 
     if (result >= 0)
         errno = result;
@@ -396,7 +329,24 @@ int main(int argc, char **argv)
     dest = argv[optind+1];
 
 
-    percurr_directory_tree();
+    struct stat st;
+    int result = lstat(source, &st);
+    if(S_ISDIR(st.st_mode) && !r_upper_flag)
+    {
+        printf("Omitting directory %s .\n", source);
+        exit(1);
+    }
+    else if(errno == ENOENT)
+    {
+        printf("Source %s does not exist!\n", source);
+        exit(1);
+    }
+    else if( result == 0)
+    {
+        percurr_directory_tree();
+
+    }
+
 
     return 0;
 }
