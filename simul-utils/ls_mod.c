@@ -370,12 +370,18 @@ int main(int argc, char **argv)
             a_upper_flag = 1;
             break;
         case 'R':
+            if(d_lower_flag){
+                d_lower_flag = 0;
+            }
             r_upper_flag = 1;
             break;
         case 'i':
             i_lower_flag = 1;
             break;
         case 'd':
+            if(r_upper_flag){
+                r_upper_flag = 0;
+            }
             d_lower_flag = 1;
             break;
         case 'l':
