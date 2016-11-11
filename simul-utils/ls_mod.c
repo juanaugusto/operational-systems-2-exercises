@@ -315,13 +315,13 @@ int print_directory_tree(const char *dirpath)
         if(stat(dirpath, &file_info_um)!=0)
         {
             printf("Erro no stat!");
-            exit(-1);
+            exit(1);
 
         }
         if(stat(dname, &file_info_dois)!=0)
         {
             printf("Erro no stat!");
-            exit(-1);
+            exit(1);
 
         }
         configure_print(&file_info_um, FTW_D, ".");
@@ -388,7 +388,7 @@ int main(int argc, char **argv)
             l_lower_flag = 1;
             break;
         case '?':
-            exit(-1);
+            exit(1);
             break;
 
         }

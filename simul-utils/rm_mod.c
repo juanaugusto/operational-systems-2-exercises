@@ -205,7 +205,7 @@ int main(int argc, char **argv)
             v_lower_flag = 1;
             break;
         case '?':
-            exit(-1);
+            exit(1);
             break;
 
         }

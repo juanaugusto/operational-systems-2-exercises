@@ -26,7 +26,6 @@
 #define USE_FDS 15
 #endif
 
-int cont_list = 0;
 
 int i_lower_flag = 0;
 int r_upper_flag = 0;
@@ -55,15 +54,17 @@ int print_copied_file(const char* filepath, const char* aux){
 
 int configure_print(const struct stat *info, const int typeflag, const char *filepath)
 {
-    cont_list++;
+
     char *part;
 
-    char *aux = malloc(256*sizeof(char));
+    char *aux = malloc(1024*sizeof(char));
 
     strcpy (aux,dest);
 
+
     part = repl_str(filepath, source, "" );
 
+    strcat(aux, "/");
     strcat(aux, part);
 
     struct stat st;
@@ -80,9 +81,12 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
 
 
 
+
+
     char overwrite;
     if(!(typeflag == FTW_D))
     {
+        aux[strlen(aux)-1] = '\0';
 
 
         int compare = 0; //If not u flag, compare equals to zero
@@ -227,28 +231,11 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
 }
 
 
-int show_not_recursively_entry(const char *filepath, const struct stat *info,
-                               const int typeflag, struct FTW *pathinfo)
-{
-
-
-    configure_print(info, typeflag, filepath );
-
-
-    if(pathinfo->level!=1)
-    {
-        return FTW_CONTINUE;
-    }
-
-    return FTW_SKIP_SUBTREE;
-
-}
-
 
 int show_recursively_entry(const char *filepath, const struct stat *info,
                            const int typeflag, struct FTW *pathinfo)
 {
-    configure_print(info, typeflag, filepath );
+    configure_print(info, typeflag, filepath + pathinfo->base );
     return FTW_CONTINUE;
 
 }
@@ -308,7 +295,7 @@ int main(int argc, char **argv)
             v_lower_flag = 1;
             break;
         case '?':
-            exit(-1);
+            exit(1);
             break;
 
         }
