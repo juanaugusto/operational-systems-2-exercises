@@ -1,0 +1,26 @@
+NOME
+
+	rm - remove arquivos ou diretórios
+
+SINOPSE
+
+	rm [OPCOES] ARQUIVO|DIRETÓRIO
+
+DESCRIÇÃO
+
+	Por padrão, remove apenas arquivos. Para remover diretórios é necessário operar recursivamente. Somente um arquivo ou diretório pode ser passado como argumento.
+
+
+	-f, --force: Ignora arquivo ou diretório não existente passado como argumento.
+
+	-i: Pergunta ao usuário se o mesmo deseja remover determinado arquivo. Ignora -f caso tenha sido passado como parâmetro.
+
+	-R, --recursive: opera recursivamente caso um diretório tenha sido passado como argumento. Caso um arquivo seja passado, -R não terá efeito algum.
+
+	--preserve-root: Por padrão, mesmo que este parâmetro não seja passado, caso se tente operar recursivamente no diretório '/', rm bloqueia a operação e alerta o usuário do risco.
+
+	--no-preserve-root: Se o usuário desejar operar no diretório '/' mesmo sabendo dos riscos, deverá obrigatoriamente passar este parâmetro.
+
+	-v, --verbose: Imprime mensagens informando o que está sendo feito.
+
+

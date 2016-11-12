@@ -19,6 +19,7 @@
 #include <stdint.h>
 #include <libgen.h>
 #include <fcntl.h>
+#include <getopt.h>
 #include "simul_utils.h"
 
 
@@ -273,9 +274,19 @@ int main(int argc, char **argv)
     extern char *optarg;
     extern int optind,optopt;
 
-    int c;
+    int c, index;
 
-    while ((c = getopt (argc, argv, "iRsuv")) != -1)
+    static struct option long_options[] =
+    {
+        {"interactive",           no_argument, 0, 'i'},
+        {"recursive",     no_argument, 0, 'R'},
+        {"verbose",     no_argument, 0, 'v'},
+        {"update",           no_argument, 0, 'u'},
+        {"symbolic-link",     no_argument, 0, 's'},
+        { NULL,            no_argument,        NULL,    0 }
+    };
+
+    while ((c = getopt_long(argc, argv, "iRsuv", long_options, &index)) != -1)
     {
         switch (c)
         {

@@ -1,0 +1,24 @@
+NOME
+
+	ls - lista os conteúdos dos diretórios
+
+SINOPSE
+	ls [OPCOES] [ARQUIVOS|PASTAS]
+
+DESCRIÇÃO
+
+	Múltiplos arquivos ou diretórios podem ser passados como argumento. Por padrão, caso nenhum parâmetro nem argumento seja passado, o conteúdo do diretório corrente é listado de forma não-recursiva. Qualquer entrada começando com '.' é ignorada.
+
+	-a, --all: Não ignorar entradas começando com '.' .
+
+	-A, --almost-all: Ignora apenas as entradas '.' (diretório corrente) e '..' (diretório pai).
+	
+	--author: Traz o autor do arquivo. Na maioria dos sistemas UNIX é o mesmo que o dono do arquivo.
+
+	-d, --directory: Lista apenas o nome dos diretórios.
+
+	-R, --recursive: Dado um diretório qualquer, lista-o recursivamente
+
+	-i, --inode: Opção para informar o inode de cada arquivo
+
+	-l: Traz uma listagem com mais detalhes, como por exemplo a data da última modificação, o dono e o grupo ao qual o arquivo pertence, tamanho e outros.

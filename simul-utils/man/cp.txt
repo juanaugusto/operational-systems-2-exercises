@@ -1,0 +1,22 @@
+NOME
+
+	cp - copia arquivos ou diretórios
+
+SINOPSE
+
+	cp [OPCOES] ORIGEM DESTINO
+
+DESCRIÇÃO
+
+	Copia de ORIGEM Para DESTINO. Caso ORIGEM seja um diretório, DESTINO necessariamente precisará sê-lo também. 
+
+	-i, --interactive: Ao copiar arquivos, caso o mesmo já exista no DESTINO, pergunta ao usuário se o mesmo deseja sobrescrever o arquivo já existente.
+
+	-R, --recursive: Caso um diretório seja passado como argumento ORIGEM, copia-o de forma recursiva para o DESTINO.
+
+	-s, --symbolic-link: Cria links simbólicos ao invés de cópias de coisas que não sejam diretórios.
+
+	-u, --update: Caso um determinado arquivo de ORIGEM já exista como DESTINO, o arquivo no DESTINO somente é sobrescrito se a data e horário da sua última modificação for anterior à data e horário do arquivo de ORIGEM.
+
+	-v, --verbose: Mostra o path de cada arquivo na ORIGEM e no DESTINO antes de copiá-lo efetivamente.  
+
