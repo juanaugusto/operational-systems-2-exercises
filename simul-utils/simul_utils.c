@@ -4,13 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <unistd.h>
-
-
 #include <fcntl.h>
-
-
-
-#include "simul_utils.h"
 
 #define BUFFERSIZE 1024
 #define COPYMORE 0644

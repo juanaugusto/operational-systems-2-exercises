@@ -41,6 +41,7 @@ char buffer_read[1000];
 /*
 Nomes: Jéssica Genta dos Santos - DRE: 111031073
        Juan Augusto Santos de Paula - DRE: 111222844
+       Oliver Sartori - DRE: 113020549 
 */
 
 int print_copied_file(const char* filepath, const char* aux){
