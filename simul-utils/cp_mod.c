@@ -67,16 +67,13 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
 
     part = repl_str(filepath, source, "" );
 
-    printf("part %s\n",part);
 
 
     if(strlen(part)>0){
         strcat(aux, "/");
-        printf("aux %s\n",aux);
         strcat(aux, part);
 
 
-        printf("aux %s\n",aux);
     }
     struct stat st;
     struct stat st2;
@@ -99,7 +96,6 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
     {
         //aux[strlen(aux)-1] = '\0';
 
-        printf("aux removing last char %s\n", aux);
 
 
         int compare = 0; //If not u flag, compare equals to zero
@@ -229,7 +225,6 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
             }
             else
             {
-                                    printf("Doing copy from filepath %s to aux %s\n", filepath, aux);
 
                 make_copy(filepath, aux);
 
@@ -251,8 +246,6 @@ int show_recursively_entry(const char *filepath, const struct stat *info,
                            const int typeflag, struct FTW *pathinfo)
 {
 
-    printf("filepath sem base %s\n", filepath);
-    printf("filepath com base %s\n", filepath+pathinfo->base);
     configure_print(info, typeflag, filepath /*+ pathinfo->base */);
     return FTW_CONTINUE;
 
