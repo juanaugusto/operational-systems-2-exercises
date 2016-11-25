@@ -41,7 +41,7 @@ char buffer_read[1000];
 /*
 Nomes: Jéssica Genta dos Santos - DRE: 111031073
        Juan Augusto Santos de Paula - DRE: 111222844
-       Oliver Sartori - DRE: 113020549 
+       Oliver Sartori - DRE: 113020549
 */
 
 int print_copied_file(const char* filepath, const char* aux){
@@ -57,6 +57,7 @@ int print_copied_file(const char* filepath, const char* aux){
 int configure_print(const struct stat *info, const int typeflag, const char *filepath)
 {
 
+
     char *part;
 
     char *aux = malloc(1024*sizeof(char));
@@ -66,9 +67,17 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
 
     part = repl_str(filepath, source, "" );
 
-    strcat(aux, "/");
-    strcat(aux, part);
+    printf("part %s\n",part);
 
+
+    if(strlen(part)>0){
+        strcat(aux, "/");
+        printf("aux %s\n",aux);
+        strcat(aux, part);
+
+
+        printf("aux %s\n",aux);
+    }
     struct stat st;
     struct stat st2;
 
@@ -88,7 +97,9 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
     char overwrite;
     if(!(typeflag == FTW_D))
     {
-        aux[strlen(aux)-1] = '\0';
+        //aux[strlen(aux)-1] = '\0';
+
+        printf("aux removing last char %s\n", aux);
 
 
         int compare = 0; //If not u flag, compare equals to zero
@@ -218,6 +229,8 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
             }
             else
             {
+                                    printf("Doing copy from filepath %s to aux %s\n", filepath, aux);
+
                 make_copy(filepath, aux);
 
             }
@@ -237,7 +250,10 @@ int configure_print(const struct stat *info, const int typeflag, const char *fil
 int show_recursively_entry(const char *filepath, const struct stat *info,
                            const int typeflag, struct FTW *pathinfo)
 {
-    configure_print(info, typeflag, filepath + pathinfo->base );
+
+    printf("filepath sem base %s\n", filepath);
+    printf("filepath com base %s\n", filepath+pathinfo->base);
+    configure_print(info, typeflag, filepath /*+ pathinfo->base */);
     return FTW_CONTINUE;
 
 }
